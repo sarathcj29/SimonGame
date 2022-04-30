@@ -5,6 +5,7 @@ var randomChosenColor;
 var gamePattern = [];
 var userClickedPattern = [];
 var level = 0;
+var started = false;
 
 // Logic
 function playSound(color) {
@@ -13,10 +14,12 @@ function playSound(color) {
 }
 
 function checkAnswer(index) {
-  console.log(gamePattern, userClickedPattern);
   if (gamePattern[index] === userClickedPattern[index]) {
-    userClickedPattern = [];
-    nextSequence();
+    if (userClickedPattern.length === gamePattern.length) {
+      setTimeout(() => {
+        nextSequence();
+      }, 1000);
+    }
   } else {
     playSound('wrong');
     $('body').addClass('game-over');
@@ -24,20 +27,29 @@ function checkAnswer(index) {
       $('body').removeClass('game-over');
     }, 200);
     $('h1').text(`Game Over, Press any key to Restart`);
+    startOver();
   }
 }
 
 function nextSequence() {
+  userClickedPattern = [];
   level++;
   $('h1').text(`Level ${level}`);
+
   randomNumber = Math.floor(Math.random() * 4);
   randomChosenColor = buttonColors[randomNumber];
   gamePattern.push(randomChosenColor);
+
   $(`#${randomChosenColor}`).fadeOut(150).fadeIn(150);
   playSound(randomChosenColor);
 }
 
-function restartGame() {}
+function startOver() {
+  level = 0;
+  gamePattern = [];
+  userClickedPattern = [];
+  started = false;
+}
 
 function animatePress(color) {
   $(`#${color}`).addClass('pressed');
@@ -46,17 +58,19 @@ function animatePress(color) {
   }, 100);
 }
 
-$('.btn').click(function (event) {
-  var userChosenColor = event.target.id;
+$('.btn').click(function () {
+  var userChosenColor = $(this).attr('id');
   userClickedPattern.push(userChosenColor);
+
   playSound(userChosenColor);
   animatePress(userChosenColor);
-  if (gamePattern.length == userClickedPattern.length)
-    checkAnswer(userClickedPattern.length - 1);
+
+  checkAnswer(userClickedPattern.length - 1);
 });
 
 $(document).keydown(function (event) {
-  console.log(event);
-  if (level == 0) nextSequence();
-  else restartGame();
+  if (!started) {
+    if (level == 0) nextSequence();
+    started = true;
+  }
 });
