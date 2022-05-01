@@ -49,6 +49,7 @@ function startOver() {
   gamePattern = [];
   userClickedPattern = [];
   started = false;
+  $('.startBtn').show();
 }
 
 function animatePress(color) {
@@ -57,6 +58,18 @@ function animatePress(color) {
     $(`#${color}`).removeClass('pressed');
   }, 100);
 }
+
+function startGame() {
+  if (!started) {
+    if (level == 0) nextSequence();
+    started = true;
+    $('.startBtn').hide();
+  }
+}
+
+$('.startBtn').click(() => {
+  startGame();
+});
 
 $('.btn').click(function () {
   var userChosenColor = $(this).attr('id');
@@ -69,8 +82,5 @@ $('.btn').click(function () {
 });
 
 $(document).keydown(function (event) {
-  if (!started) {
-    if (level == 0) nextSequence();
-    started = true;
-  }
+  startGame();
 });
